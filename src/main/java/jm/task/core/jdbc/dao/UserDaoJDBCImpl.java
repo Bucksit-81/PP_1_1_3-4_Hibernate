@@ -8,15 +8,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UserDaoJDBCImpl implements UserDao {
-    private final Connection connection = Util.getConnection();
+
 
     public UserDaoJDBCImpl() {
 
     }
 
     public void createUsersTable() {
+        final Connection connection = Util.getConnection();
         try (Statement statement = connection.createStatement()) {
-            statement.executeUpdate("CREATE TABLE IF NOT EXISTS test.users" +
+            statement.executeUpdate("CREATE TABLE IF NOT EXISTS mydbtest.user" +
                     "(id mediumint not null auto_increment," +
                     " name VARCHAR(50), " +
                     "lastname VARCHAR(50), " +
@@ -26,21 +27,41 @@ public class UserDaoJDBCImpl implements UserDao {
         } catch (SQLException e) {
             e.printStackTrace();
 
+        } finally {
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+
         }
     }
 
     public void dropUsersTable() {
+        final Connection connection = Util.getConnection();
         try (Statement statement = connection.createStatement()) {
-            statement.executeUpdate("Drop table if exists mybasetest.users");
+            statement.executeUpdate("Drop table if exists mydbtest.user");
             System.out.println("Таблица удалена");
         } catch (SQLException e) {
             e.printStackTrace();
+
+        } finally {
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
 
         }
     }
 
     public void saveUser(String name, String lastName, byte age) {
-        String sql = "INSERT INTO test.users(name, lastname, age) VALUES(?,?,?)";
+        final Connection connection = Util.getConnection();
+        String sql = "INSERT INTO mydbtest.user(name, lastname, age) VALUES(?,?,?)";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setString(1, name);
             preparedStatement.setString(2, lastName);
@@ -53,19 +74,30 @@ public class UserDaoJDBCImpl implements UserDao {
     }
 
     public void removeUserById(long id) {
+        final Connection connection = Util.getConnection();
         try (Statement statement = connection.createStatement()) {
-            String sql = "DELETE FROM test.users where id";
+            String sql = "DELETE FROM mydbtest.user where id";
             statement.executeUpdate(sql);
             System.out.println("User удален");
         } catch (SQLException e) {
             e.printStackTrace();
 
+        } finally {
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+
         }
     }
 
     public List<User> getAllUsers() {
+        final Connection connection = Util.getConnection();
         List<User> allUser = new ArrayList<>();
-        String sql = "SELECT id, name, lastName, age from test.users";
+        String sql = "SELECT id, name, lastName, age from mydbtest.user";
 
         try (Statement statement = connection.createStatement()) {
             ResultSet resultSet = statement.executeQuery(sql);
@@ -82,18 +114,37 @@ public class UserDaoJDBCImpl implements UserDao {
         } catch (Exception e) {
             e.printStackTrace();
 
+        } finally {
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+
         }
         return allUser;
     }
 
     public void cleanUsersTable() {
-        String sql = "DELETE FROM test.users";
+        final Connection connection = Util.getConnection();
+        String sql = "TRUNCATE mydbtest.user";
         try (Statement statement = connection.createStatement()) {
             statement.executeUpdate(sql);
             System.out.println("Таблица очищена");
         } catch (SQLException e) {
             e.printStackTrace();
             System.out.println("Не удалось очистить");
+
+        } finally {
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
 
         }
     }
